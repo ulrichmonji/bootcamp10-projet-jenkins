@@ -11,6 +11,14 @@ pipeline {
         PRODUCTION = "chocoapp-prod"
         DOCKERHUB_ID = "choco1992"
         DOCKERHUB_PASSWORD = credentials('dockerhub_password')
+        APP_NAME = "ulrich"
+        STG_API_ENDPOINT = "ip10-0-1-3-cc7bafssrdn0fvnms4tg-1993.direct.docker.labs.eazytraining.fr"
+        STG_APP_ENDPOINT = "ip10-0-1-3-cc7bafssrdn0fvnms4tg-80.direct.docker.labs.eazytraining.fr"
+        PROD_API_ENDPOINT = "ip10-0-1-4-cc7bafssrdn0fvnms4tg-1993.direct.docker.labs.eazytraining.fr"
+        PROD_APP_ENDPOINT = "ip10-0-1-4-cc7bafssrdn0fvnms4tg-80.direct.docker.labs.eazytraining.fr"
+        INTERNAL_PORT = "5000"
+        EXTERNAL_PORT = "${PORT_EXPOSED}"
+        CONTAINER_IMAGE = "${ID_DOCKER}/${IMAGE_NAME}:${IMAGE_TAG}"
     }
     agent none
     stages {
@@ -69,31 +77,23 @@ pipeline {
           }
       }
 
-      stage('Push image in staging and deploy it') {
-        when {
-            expression { GIT_BRANCH == 'origin/main' }
-        }
+      stage('STAGING - Deploy app') {
+        /* when {
+            expression { GIT_BRANCH == 'origin/deploy' }
+        } *:
 	/* agent {
         	docker { image 'franela/dind' }
 	} */
       agent any
-
-
-        environment {
-            HEROKU_API_KEY = credentials('heroku_api_key')
+      steps {
+          script {
+            sh """
+              echo  {\\"your_name\\":\\"${APP_NAME}\\",\\"container_image\\":\\"${CONTAINER_IMAGE}\\", \\"external_port\\":\\"${EXTERNAL_PORT}\\", \\"internal_port\\":\\"${INTERNAL_PORT}\\"}  > data.json 
+              curl -X POST http://${STG_API_ENDPOINT}/staging -H 'Content-Type: application/json'  --data-binary @data.json 
+            """
+          }
         }
-        steps {
-           script {
-             sh '''
-                apk --no-cache add npm
-                npm install -g heroku
-                heroku container:login
-                heroku create $STAGING || echo "projets already exist"
-                heroku container:push -a $STAGING web
-                heroku container:release -a $STAGING web
-             '''
-           }
-        }
+     
      }
      stage('Push image in production and deploy it') {
        when {
