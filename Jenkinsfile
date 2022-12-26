@@ -78,12 +78,6 @@ pipeline {
       }
 
       stage('STAGING - Deploy app') {
-        /* when {
-            expression { GIT_BRANCH == 'origin/deploy' }
-        } *:
-	/* agent {
-        	docker { image 'franela/dind' }
-	} */
       agent any
       steps {
           script {
@@ -95,38 +89,29 @@ pipeline {
         }
      
      }
-     stage('Push image in production and deploy it') {
+     stage('PROD - Deploy app') {
        when {
            expression { GIT_BRANCH == 'origin/main' }
        }
-	/*agent {
-        	docker { image 'franela/dind' }
-	} */
      agent any
 
-       environment {
-           HEROKU_API_KEY = credentials('heroku_api_key')
-       }
        steps {
           script {
-            sh '''
-               apk --no-cache add npm
-               npm install -g heroku
-               heroku container:login
-               heroku create $PRODUCTION || echo "projets already exist"
-               heroku container:push -a $PRODUCTION web
-               heroku container:release -a $PRODUCTION web
-            '''
+            sh """
+              echo  {\\"your_name\\":\\"${APP_NAME}\\",\\"container_image\\":\\"${CONTAINER_IMAGE}\\", \\"external_port\\":\\"${EXTERNAL_PORT}\\", \\"internal_port\\":\\"${INTERNAL_PORT}\\"}  > data.json 
+              curl -v -X POST http://${PROD_API_ENDPOINT}/staging -H 'Content-Type: application/json'  --data-binary @data.json
+            """
           }
        }
      }
   }
   post {
-     always {
-       script {
-         slackNotifier currentBuild.result
-     }
-    }
-  }
+       success {
+         slackSend (color: '#00FF00', message: "ULRICH - SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}) - PROD URL => http://${PROD_APP_ENDPOINT} , STAGING URL => http://${STG_APP_ENDPOINT}")
+         }
+      failure {
+            slackSend (color: '#FF0000', message: "ULRICH - FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+          }   
+    }  
 }
 
