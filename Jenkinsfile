@@ -18,7 +18,7 @@ pipeline {
         PROD_APP_ENDPOINT = "ip10-0-1-4-cc7bafssrdn0fvnms4tg-80.direct.docker.labs.eazytraining.fr"
         INTERNAL_PORT = "5000"
         EXTERNAL_PORT = "${PORT_EXPOSED}"
-        CONTAINER_IMAGE = "${DOCKERUB_ID}/${IMAGE_NAME}:${IMAGE_TAG}"
+        CONTAINER_IMAGE = "${DOCKERHUB_ID}/${IMAGE_NAME}:${IMAGE_TAG}"
     }
     agent none
     stages {
