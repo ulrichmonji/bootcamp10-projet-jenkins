@@ -18,7 +18,7 @@ pipeline {
         PROD_APP_ENDPOINT = "ip10-0-1-4-cc7bafssrdn0fvnms4tg-80.direct.docker.labs.eazytraining.fr"
         INTERNAL_PORT = "5000"
         EXTERNAL_PORT = "${PORT_EXPOSED}"
-        CONTAINER_IMAGE = "${DOCKERHUB_ID}/${IMAGE_NAME}:${IMAGE_TAG}"
+        CONTAINER_IMAGE = "${DOCKERUB_ID}/${IMAGE_NAME}:${IMAGE_TAG}"
     }
     agent none
     stages {
@@ -89,7 +89,7 @@ pipeline {
           script {
             sh """
               echo  {\\"your_name\\":\\"${APP_NAME}\\",\\"container_image\\":\\"${CONTAINER_IMAGE}\\", \\"external_port\\":\\"${EXTERNAL_PORT}\\", \\"internal_port\\":\\"${INTERNAL_PORT}\\"}  > data.json 
-              curl -v -X POST http://${STG_API_ENDPOINT}/staging -H 'Content-Type: application/json'  --data-binary @data.json 
+              curl -v -X POST http://${STG_API_ENDPOINT}/staging -H 'Content-Type: application/json'  --data-binary @data.json | grep -i '200 OK'
             """
           }
         }
