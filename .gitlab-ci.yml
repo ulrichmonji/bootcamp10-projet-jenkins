@@ -83,13 +83,13 @@ stop review:
     - apk --no-cache add curl
     - 'curl -X DELETE http://${API_ENDPOINT}/review -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\"}"'
 
-.deploy_template: &test
+.test_template: &test
   image: alpine
   only:
     - main
   script:
     - apk --no-cache add curl
-    - curl "http://$DOMAIN" || grep -i "Dimension" 
+    - curl "http://$DOMAIN" | grep -i "Dimension" 
 
 deploy staging:
   stage: Deploy staging
