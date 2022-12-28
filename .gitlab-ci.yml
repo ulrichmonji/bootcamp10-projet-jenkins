@@ -1,6 +1,6 @@
 variables:
-  EAZYLABS_IP: "ip10-0-1-3-cem91qgmjkegg872casg"
-  APP_NAME: ulrich-staticwebsite
+  EAZYLABS_IP: <REPLACE BY THE EAZYLABS IP>
+  APP_NAME: <YOUR-FIRST-NAME>-staticwebsite
   EAZYLABS_DOMAIN: direct.docker.labs.eazytraining.fr  
   API_PORT: "1993"
   API_ENDPOINT: ${EAZYLABS_IP}-${API_PORT}.${EAZYLABS_DOMAIN}
@@ -9,8 +9,6 @@ variables:
   PROD_EXTERNAL_PORT: 80
   REVIEW_EXTERNAL_PORT: 8000
   CONTAINER_IMAGE: ${IMAGE_NAME}:${CI_COMMIT_REF_NAME}
-
-
 
 image: docker:latest
 services:
@@ -102,7 +100,6 @@ deploy staging:
     - main
   script:
     - apk --no-cache add curl
-    - echo ${API_ENDPOINT} ${APP_NAME} ${CONTAINER_IMAGE} ${STG_EXTERNAL_PORT} ${INTERNAL_PORT} ${EAZYLABS_IP}-${STG_EXTERNAL_PORT}.${EAZYLABS_DOMAIN}
     - 'curl -X POST http://${API_ENDPOINT}/staging -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\",\"container_image\":\"${CONTAINER_IMAGE}\", \"external_port\":\"${STG_EXTERNAL_PORT}\", \"internal_port\":\"${INTERNAL_PORT}\"}"'
 
 test staging:
