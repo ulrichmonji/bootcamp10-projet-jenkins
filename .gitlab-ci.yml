@@ -123,5 +123,5 @@ test prod:
   stage: Test prod
   <<: *test
   variables:
-    DOMAIN: $${EAZYLABS_IP}-${PROD_EXTERNAL_PORT}.${EAZYLABS_DOMAIN}
+    DOMAIN: ${EAZYLABS_IP}-${PROD_EXTERNAL_PORT}.${EAZYLABS_DOMAIN}
 
